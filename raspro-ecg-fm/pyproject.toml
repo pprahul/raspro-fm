@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "raspro-fm"
+version = "0.1.0"
+description = "Clinical Symbolic Summarization (SAX & RASPRO) for Data-Efficient Biosignal Foundation Models (ECG & PPG)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Dr. Rahul Krishnan Pathinarupothi"}
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "scikit-learn>=1.2.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+deep = [
+    "torch>=2.1.0",
+    "wfdb>=4.1.0",
+    "matplotlib>=3.7.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

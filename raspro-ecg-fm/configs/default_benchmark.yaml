@@ -1,0 +1,72 @@
+# RASPRO-FM Default Benchmark Configuration
+
+signal:
+  sampling_rate_hz: 100
+  duration_sec: 30.0
+  leads: ["ECG_II", "PPG_FINGER"]
+
+tokenizers:
+  patch:
+    patch_duration_sec: 0.20      # 200 ms patches -> 150 tokens per 30s channel (300 multi-sensor)
+    stride_sec: 0.20
+
+  sax:
+    word_length_sec: 0.20         # 1 PAA segment per 200 ms
+    alphabet_size: 8              # Symbols 'a' through 'h' via N(0,1) quantiles
+
+  sax_bpe:
+    base_alphabet_size: 8
+    vocab_size: 128               # Learned BPE subword merges over SAX string
+
+  raspro:
+    # Physician Assist Filter (PAF) Clinical Quantization Thresholds
+    # Symbols:
+    #   N = Normal (Severity 0)
+    #   L = Borderline Low (Severity 1)
+    #   H = Borderline High (Severity 1)
+    #   D = Critical Low / Depressed (Severity 2)
+    #   E = Critical High / Elevated (Severity 2)
+    paf_thresholds:
+      rr_interval_ms:
+        critical_low: 500.0       # > 120 bpm tachyarrhythmia
+        borderline_low: 600.0     # 100-120 bpm mild tachycardia
+        borderline_high: 1000.0   # 60-100 bpm normal sinus
+        critical_high: 1200.0     # < 50 bpm severe bradycardia
+      qrs_duration_ms:
+        critical_low: 60.0
+        borderline_low: 70.0
+        borderline_high: 110.0    # > 110 ms incomplete BBB
+        critical_high: 125.0      # > 125 ms wide QRS / PVC / VT
+      st_deviation_mv:
+        critical_low: -0.15       # Severe ST depression (NSTEMI/ischemia)
+        borderline_low: -0.08     # Mild ST depression
+        borderline_high: 0.08     # Isoelectric normal range [-0.08, +0.08] mV
+        critical_high: 0.15       # ST elevation (STEMI)
+      ppg_amp_ratio:
+        critical_low: 0.45        # Severe hypoperfusion / AHE / PVC pulse deficit
+        borderline_low: 0.75      # Mildly damped pulse volume
+        borderline_high: 1.25
+        critical_high: 1.60
+      ppg_notch_index:
+        critical_low: 0.10        # Absent dicrotic notch / severe vasodilation
+        borderline_low: 0.22      # Blunted notch
+        borderline_high: 0.55
+        critical_high: 0.75
+      pat_ms:
+        critical_low: 140.0       # Hypertensive / stiff arterial transit
+        borderline_low: 170.0
+        borderline_high: 230.0    # Normal ECG-to-PPG Pulse Arrival Time
+        critical_high: 265.0      # Prolonged PAT -> Acute Hypotensive Episode (AHE)
+
+    window_beats: 5               # Number of beats per SSM/MSM motif summary window
+    active_dedup_max_run: 6       # Collapse consecutive identical Consensus Normal Motifs (CM)
+    cmi_alpha_weight: 3.0         # CMI weighting factor during Masked Motif Pre-training
+
+benchmark:
+  n_pretrain_records: 400
+  n_eval_records: 150
+  data_fractions: [0.05, 0.10, 0.25, 0.50, 1.00]
+  embed_dim: 64
+  n_heads: 4
+  n_layers: 3
+  random_seed: 42
