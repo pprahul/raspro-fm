@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RASPRO-FM | Rapid Active Summarization for Data and Compute Efficient Biosignal Foundation Models</title>
+  <meta name="description" content="RASPRO-FM extends Rapid Active Summarization for Effective Prognosis (RASPRO) to multi-layer GPU Transformer Foundation Models for 12-lead ECG and multi-sensor ICU telemetry, achieving 50x–2,215x reduction in O(L^2) attention FLOPs and 20x pre-training data efficiency." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-alt: #f1f5f9;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --primary: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent: #0f766e;
+      --accent-light: #f0fdfa;
+      --danger: #b91c1c;
+      --danger-light: #fef2f2;
+      --warn: #b45309;
+      --warn-light: #fffbeb;
+      --radius: 12px;
+      --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Hero Header */
+    header.hero {
+      background: radial-gradient(circle at 50% 0%, #eff6ff 0%, #f8fafc 72%);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 0 44px;
+      text-align: center;
+    }
+
+    .venue-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    h1.paper-title {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: clamp(1.85rem, 3.6vw, 2.65rem);
+      font-weight: 600;
+      line-height: 1.22;
+      color: #0f172a;
+      max-width: 920px;
+      margin: 0 auto 20px;
+    }
+
+    .authors {
+      font-size: 1.06rem;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .authors span.author {
+      margin: 0 8px;
+      display: inline-block;
+    }
+
+    .affiliations {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 26px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.18s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: #cbd5e1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .btn-badge {
+      background: #f8fafc;
+      color: #475569;
+      border-color: #cbd5e1;
+      cursor: default;
+    }
+
+    /* Metric Highlight Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+      gap: 16px;
+      text-align: left;
+      margin-top: 12px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.15;
+      margin-bottom: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .metric-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Sections */
+    section {
+      padding: 44px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2.section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .abstract-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow);
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 1.05rem;
+      color: #1e293b;
+      line-height: 1.72;
+    }
+
+    /* Acronym / Terminology Grid */
+    .acronym-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .acronym-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .acronym-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-right: 6px;
+    }
+
+    .acronym-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+
+    .acronym-desc {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    /* Figures */
+    .figure-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .figure-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+    }
+
+    .figure-caption {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 14px;
+      line-height: 1.55;
+    }
+
+    /* Interactive Motif Explorer */
+    .explorer-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .pill-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .pill-tab {
+      background: var(--surface-alt);
+      border: 1px solid #cbd5e1;
+      color: var(--text);
+      padding: 8px 15px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill-tab.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .motif-display {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 10px;
+      padding: 18px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .motif-token {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    .motif-badges {
+      display: flex;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+
+    .motif-badge {
+      background: rgba(255,255,255,0.12);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+      gap: 10px;
+    }
+
+    .slot-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      background: var(--bg);
+    }
+
+    .slot-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .slot-sym {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .sym-N { background: #dcfce7; color: #166534; }
+    .sym-B, .sym-Y { background: #fef3c7; color: #92400e; }
+    .sym-A, .sym-Z { background: #fee2e2; color: #991b1b; }
+
+    .slot-Meaning {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.87rem;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--surface-alt);
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    tr.highlight-row {
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    tr.sub-highlight {
+      background: #f8fafc;
+    }
+
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    pre.code-block {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 18px 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 36px 0;
+      text-align: center;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="container">
+      <div class="venue-pill">Biosignal Foundation Models · Clinical Symbolic Summarization</div>
+      <h1 class="paper-title">RASPRO-FM: Rapid Active Summarization for Data and Compute Efficient Biosignal Foundation Models</h1>
+      <div class="authors">
+        <span class="author">Rahul Krishnan Pathinarupothi<sup>1</sup></span>
+        <span class="author">Durga Padmavilochanan<sup>1</sup></span>
+        <span class="author">Maneesha Vinodini Ramesh<sup>1</sup></span>
+        <span class="author">Saptarshi Purkayastha<sup>2</sup></span>
+      </div>
+      <div class="affiliations">
+        <sup>1</sup>Amrita Vishwa Vidyapeetham, India &nbsp;·&nbsp; <sup>2</sup>Indiana University, Indianapolis, IN, USA
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-primary" href="https://github.com/pprahul/raspro-fm" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub Code &amp; Benchmarks
+        </a>
+        <span class="btn btn-badge">📄 Manuscript (Under Review — IEEE JBHI)</span>
+        <a class="btn btn-secondary" href="#benchmarks">📊 PTB-XL &amp; MIMIC-IV Leaderboard</a>
+        <a class="btn btn-secondary" href="#quickstart">⚡ Quickstart &amp; Reproducibility</a>
+        <a class="btn btn-secondary" href="#citation">📚 BibTeX</a>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">1,797×</div>
+          <div class="metric-label">Fewer O(L²) Attention FLOPs</div>
+          <div class="metric-sub">Compresses 12-lead ECGs to L=3.54 active tokens (vs. L=150 in ST-MEM) and up to 2,215× on 8-min ICU streams.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">79.79%</div>
+          <div class="metric-label">PTB-XL Fold-10 Superclass AUROC</div>
+          <div class="metric-sub">79.08% 4-Task Mean Macro-AUROC, surpassing published SimCLR, BYOL, MaeFE, MERL, CLOCS, and ST-MEM.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">78.06%</div>
+          <div class="metric-label">Zero-Shot Cross-Hospital Transfer</div>
+          <div class="metric-sub">Pre-trained strictly on unlabeled 500 Hz MIMIC-IV-ECG ICU/ED streams (3.4 s) and evaluated on PTB-XL Fold 10.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">0.98 s</div>
+          <div class="metric-label">5% CMI Coreset Pre-Training</div>
+          <div class="metric-sub">Sub-second GPU pre-training on 80 CMI-selected ECGs reaches 77.61% Superclass AUROC (20× data efficiency).</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Abstract -->
+    <section id="abstract">
+      <h2 class="section-title">Abstract</h2>
+      <div class="abstract-box">
+        Self-supervised Foundation Models (FMs) for electrocardiogram (ECG) and photoplethysmogram (PPG) waveforms rely predominantly on fixed-duration signal patching (<em>ST-MEM</em>, <em>MaeFE</em>), vector-quantized heartbeat codebooks (<em>HeartLang</em>), or Gaussian symbolic subwords (<em>ECG-Byte</em>). Despite strong accuracy on massive archives, these paradigms suffer from three structural bottlenecks: (1) severe temporal redundancy on stationary sinus rhythm, inflating quadratic O(L²) Transformer attention compute; (2) physiological blindness to low-amplitude clinical landmarks (e.g., ST-segment shifts, PR delays, pathological Q-waves, dicrotic notch blunting) under z-normalization; and (3) low-data fragility under random subsampling. Building on our research team's prior work on Rapid Active Summarization for Effective Prognosis (RASPRO) for data-efficient smart-edge prognostic models, we extend the RASPRO framework to pre-train multi-layer Biosignal Foundation Models (RASPRO-FM). RASPRO synchronizes to cardiac R-peaks, quantizes 9-slot 12-lead anatomical and 6-slot multi-sensor parameters into a clinical severity alphabet Σ = {<code>A</code>, <code>B</code>, <code>N</code>, <code>Y</code>, <code>Z</code>} via Physician Assist Filters (<code>PAF</code>), summarizes multi-beat windows into Consensus Motifs (<code>CM</code>) and Consensus Abnormality Motifs (<code>CAM</code>), and run-length merges stationary segments. We pair RASPRO with a 72-D Compositional Slot-and-Pair Subspace, a CMI-Biased Multi-Layer Transformer, and Criticality Measure Index (CMI) Submodular Coreset Selection. Across PhysioNet PTB-XL, cross-hospital MIMIC-IV-ECG, and PhysioNet BIDMC ICU streams, RASPRO-FM reduces O(L²) attention compute by 50×–2,215× (1,797× vs. <em>ST-MEM</em>), reaches 79.79% Superclass and 79.08% 4-task Mean Macro-AUROC on PTB-XL Fold 10 (outperforming <em>SimCLR</em>, <em>BYOL</em>, <em>MaeFE</em>, <em>MERL</em>, <em>CLOCS</em>, and <em>ST-MEM</em>), transfers zero-shot across hospitals (78.06% AUROC), and achieves 10×–20× pre-training data efficiency.
+      </div>
+
+      <div class="acronym-grid">
+        <div class="acronym-card">
+          <span class="acronym-tag">RASPRO</span><span class="acronym-title">Rapid Active Summarization for Effective Prognosis</span>
+          <p class="acronym-desc">Transforms high-frequency multi-sensor physiological streams into compact, clinically interpretable motif sequences.</p>
+        </div>
+        <div class="acronym-card">
+          <span class="acronym-tag">PAF</span><span class="acronym-title">Physician Assist Filters</span>
+          <p class="acronym-desc">Quantizes calibrated physiological slots into a 5-level clinical severity alphabet Σ = {A, B, N, Y, Z}.</p>
+        </div>
+        <div class="acronym-card">
+          <span class="acronym-tag">SSM / MSM</span><span class="acronym-title">Single-Sensor / Multi-Sensor Matrix</span>
+          <p class="acronym-desc">Beat-synchronous 9-slot 12-lead ECG anatomical matrix and 6-slot coupled ICU multi-sensor (ECG+PPG+RESP) matrix.</p>
+        </div>
+        <div class="acronym-card">
+          <span class="acronym-tag">PHM (CM / CAM)</span><span class="acronym-title">Personalized Health Motifs</span>
+          <p class="acronym-desc">Separates stationary homeostatic windows into Consensus Motifs (CM) and acute excursions into Consensus Abnormality Motifs (CAM).</p>
+        </div>
+        <div class="acronym-card">
+          <span class="acronym-tag">CMI</span><span class="acronym-title">Criticality Measure Index</span>
+          <p class="acronym-desc">Continuous urgency score [0, 1] that biases multi-head Transformer attention and guides submodular coreset selection.</p>
+        </div>
+        <div class="acronym-card">
+          <span class="acronym-tag">72-D Subspace</span><span class="acronym-title">Compositional Slot-and-Pair Prior</span>
+          <p class="acronym-desc">Eliminates vocabulary sparsity across 5.86M motif combinations via signed slot polarity and 36 pairwise cross-lead interactions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture & Visual Comparison -->
+    <section id="architecture">
+      <h2 class="section-title">Tokenization Paradigm &amp; RASPRO-FM Architecture</h2>
+      <div class="figure-card">
+        <img src="assets/raspro_fm_tokenizer_comparison.png" alt="Visual comparison of biosignal tokenization paradigms on a 10-second clinical ECG strip" />
+        <div class="figure-caption">
+          <strong>Figure 1: Biosignal Tokenization Comparison on a 10-Second Clinical ECG Strip.</strong> Continuous Patching and Vanilla SAX emit L=25–150 fixed-clock tokens; ECG-Byte merges frequent subwords (L=20); HeartLang emits one VQ token per heartbeat (L=13.6); RASPRO summarizes 4-beat windows into Consensus Motifs (<code>CM</code>) and Consensus Abnormality Motifs (<code>CAM</code>) and run-length merges stationary normal runs into just L=3.54 active tokens (50×–1,797× fewer O(L²) attention FLOPs).
+        </div>
+      </div>
+
+      <div class="figure-card">
+        <img src="assets/raspro_fm_architecture_diagram.png" alt="End-to-end RASPRO-FM architecture across 12-lead ECG and coupled multi-sensor ICU streams" />
+        <div class="figure-caption">
+          <strong>Figure 2: End-to-End RASPRO-FM Architecture.</strong> Four-stage pipeline combining (1) Beat-Synchronous 9-Slot 12-Lead &amp; 6-Slot ICU Multi-Sensor Feature Extraction with Physician Assist Filters (<code>PAF</code>), (2) Hierarchical <code>MSM → CM/CAM</code> Summarization &amp; Active Deduplication, (3) 72-D Compositional Slot-and-Pair Subspace + 4-Layer CMI-Biased <code>RASPRO-Transformer FM</code>, and (4) Two-Stage Hierarchical CMI Submodular Coreset Selection.
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Motif Inspector -->
+    <section id="explorer">
+      <h2 class="section-title">Interactive 9-Slot RASPRO Motif Inspector</h2>
+      <div class="explorer-box">
+        <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 14px;">
+          Select a clinical condition below to inspect how the 9-slot <code>RASPRO-12Lead</code> Physician Assist Filters (<code>PAF</code>) quantize physiological landmarks into interpretable Personalized Health Motifs (<code>PHMs</code>):
+        </p>
+        <div class="pill-tabs" id="motif-tabs">
+          <button class="pill-tab active" onclick="selectMotif(0)">Normal Sinus Rhythm (NSR)</button>
+          <button class="pill-tab" onclick="selectMotif(1)">Acute Anterior-Inferior STEMI</button>
+          <button class="pill-tab" onclick="selectMotif(2)">Evolved Inferior MI (+9th QT_MORPH Slot)</button>
+          <button class="pill-tab" onclick="selectMotif(3)">Atrial Fibrillation + RVR</button>
+          <button class="pill-tab" onclick="selectMotif(4)">Left Bundle Branch Block (CLBBB)</button>
+        </div>
+
+        <div class="motif-display">
+          <div>
+            <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Emitted Active RASPRO Token</div>
+            <div class="motif-token" id="motif-string">CM:NNNNNNNNN|REGx3</div>
+          </div>
+          <div class="motif-badges">
+            <span class="motif-badge" id="motif-type">Type: Consensus Motif (CM)</span>
+            <span class="motif-badge" id="motif-cmi">CMI Urgency: 0.000</span>
+            <span class="motif-badge" id="motif-len">Active Sequence L = 3 tokens</span>
+          </div>
+        </div>
+
+        <div class="slots-grid" id="slots-container"></div>
+      </div>
+    </section>
+
+    <!-- Benchmarks -->
+    <section id="benchmarks">
+      <h2 class="section-title">Main Experimental Results (PTB-XL Fold 10, MIMIC-IV-ECG &amp; BIDMC ICU)</h2>
+      <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 16px;">
+        Evaluated on the official <strong>PhysioNet PTB-XL Fold-10</strong> linear probing benchmark across all 4 SCP-ECG hierarchies (<code>Superclass</code>, <code>Subclass</code>, <code>Form</code>, <code>Rhythm</code>) and zero-shot cross-hospital transfer from 500 Hz <strong>PhysioNet MIMIC-IV-ECG (v1.0)</strong> ICU/ED waveforms:
+      </p>
+
+      <div class="table-wrap" style="margin-bottom: 28px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Foundation Model / Paradigm</th>
+              <th>Pre-Training Cohort &amp; Time</th>
+              <th>Tokens (L)</th>
+              <th>FLOP Savings</th>
+              <th>Superclass (1% / 10% / 100%)</th>
+              <th>Subclass (100%)</th>
+              <th>Form (100%)</th>
+              <th>Rhythm (100%)</th>
+              <th>4-Task Mean</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SimCLR (Contrastive SSL)</td>
+              <td>PTB-XL (ICML 2020)</td>
+              <td>25.0</td>
+              <td>1.0×</td>
+              <td>63.41 / 69.77 / 73.53%</td>
+              <td>66.89%</td>
+              <td>62.52%</td>
+              <td>67.30%</td>
+              <td>67.56%</td>
+            </tr>
+            <tr>
+              <td>BYOL (Bootstrap SSL)</td>
+              <td>PTB-XL (NeurIPS 2020)</td>
+              <td>25.0</td>
+              <td>1.0×</td>
+              <td>68.09 / 73.95 / 76.45%</td>
+              <td>70.69%</td>
+              <td>65.65%</td>
+              <td>70.69%</td>
+              <td>70.87%</td>
+            </tr>
+            <tr>
+              <td>MTAE / MLAE (MaeFE)</td>
+              <td>PTB-XL (AAAI 2023)</td>
+              <td>25.0</td>
+              <td>1.0×</td>
+              <td>66.15 / 73.69 / 77.10%</td>
+              <td>71.68%</td>
+              <td>64.12%</td>
+              <td>70.18%</td>
+              <td>70.77%</td>
+            </tr>
+            <tr>
+              <td>MERL (Linear Probe Only)</td>
+              <td>PTB-XL (ICML 2024)</td>
+              <td>25.0</td>
+              <td>1.0×</td>
+              <td>69.80 / 72.95 / 74.29%</td>
+              <td>74.32%</td>
+              <td>67.40%</td>
+              <td>75.80%</td>
+              <td>72.95%</td>
+            </tr>
+            <tr>
+              <td>CLOCS (Cardiac Contrastive)</td>
+              <td>PTB-XL (ICML 2021)</td>
+              <td>25.0</td>
+              <td>1.0×</td>
+              <td>68.94 / 76.31 / 77.69%</td>
+              <td>73.79%</td>
+              <td>67.60%</td>
+              <td>74.34%</td>
+              <td>73.36%</td>
+            </tr>
+            <tr>
+              <td>ST-MEM (Spatio-Temporal MAE)</td>
+              <td>PTB-XL (ICLR 2024)</td>
+              <td>150.0</td>
+              <td>1.0× (Ref)</td>
+              <td>67.15 / 76.12 / 81.90%</td>
+              <td>74.85%</td>
+              <td>70.20%</td>
+              <td>77.26%</td>
+              <td>76.05%</td>
+            </tr>
+            <tr class="sub-highlight">
+              <td><code>RASPRO-Transformer FM</code> (8-Slot, 100%)</td>
+              <td>Ours (PTB-XL, 19.9 s on M2 <code>mps</code>)</td>
+              <td><strong>3.53</strong></td>
+              <td><strong>1,810×</strong></td>
+              <td>60.57 / 76.98 / 77.66%</td>
+              <td>76.14%</td>
+              <td>71.91%</td>
+              <td><strong>86.56%</strong></td>
+              <td>78.07%</td>
+            </tr>
+            <tr class="sub-highlight">
+              <td><code>RASPRO-Transformer FM</code> (9-Slot, Zero-Shot)</td>
+              <td><strong>Ours (MIMIC-IV-ECG SSL, 3.4 s)</strong></td>
+              <td>3.56</td>
+              <td>1,773×</td>
+              <td>61.49 / 77.16 / 78.06%</td>
+              <td>76.57%</td>
+              <td>70.72%</td>
+              <td>84.56%</td>
+              <td>77.48%</td>
+            </tr>
+            <tr class="sub-highlight">
+              <td><code>RASPRO-Transformer FM</code> (9-Slot, 5% Coreset)</td>
+              <td>Ours (PTB-XL 5%, <strong>0.98 s</strong>)</td>
+              <td>3.54</td>
+              <td>1,797×</td>
+              <td>— / — / 77.61%</td>
+              <td>76.12%</td>
+              <td>71.24%</td>
+              <td>85.00%</td>
+              <td>77.49%</td>
+            </tr>
+            <tr class="sub-highlight">
+              <td><code>RASPRO-Transformer FM</code> (9-Slot, 10% Coreset)</td>
+              <td>Ours (PTB-XL 10%, 2.43 s)</td>
+              <td>3.54</td>
+              <td>1,797×</td>
+              <td>61.51 / 76.78 / 77.79%</td>
+              <td>76.43%</td>
+              <td>71.47%</td>
+              <td>84.99%</td>
+              <td>77.67%</td>
+            </tr>
+            <tr class="highlight-row">
+              <td><code>RASPRO-Transformer FM</code> (9-Slot, 100%)</td>
+              <td>Ours (PTB-XL 100%, 12.7 s on M2 <code>mps</code>)</td>
+              <td>3.54</td>
+              <td>1,797×</td>
+              <td>61.71 / 78.63 / 79.79%</td>
+              <td>78.31%</td>
+              <td>72.71%</td>
+              <td>85.50%</td>
+              <td>79.08%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Quickstart -->
+    <section id="quickstart">
+      <h2 class="section-title">Quickstart &amp; 1-Command Reproducibility</h2>
+      <p style="font-size: 0.92rem; color: var(--text-muted);">
+        The repository includes pre-tokenized lightweight <code>.npz</code> hospital caches (<code>data_cache/ptbxl_hospital_1600_300_400.npz</code> at 871 KB and <code>data_cache/mimic_iv_ecg_stream_160.npz</code> at 59 KB) so all benchmarks run out-of-the-box without requiring multi-gigabyte PhysioNet downloads:
+      </p>
+      <pre class="code-block">git clone https://github.com/pprahul/raspro-fm.git
+cd raspro-fm
+pip install -e .
+
+# 1. Run Multi-Layer GPU/MPS RASPRO-Transformer FM on PTB-XL Fold 10 + Zero-Shot MIMIC-IV-ECG Transfer
+python scripts/run_phase4_full_hospital_transformer.py
+
+# 2. Run Controlled 12-Lead Tokenizer Ablations (Patch, SAX, ECG-Byte, HeartLang-QRS, RASPRO 6/8/9-Slot)
+python scripts/run_phase3_ptbxl_sota_benchmark.py
+
+# 3. Run Real-World Multi-Sensor ICU Telemetry Benchmark (PhysioNet BIDMC ECG + PPG + RESP)
+python scripts/run_phase2_physionet_benchmark.py
+
+# 4. Run Coupled ECG + PPG Biophysical Data-Scaling Benchmark (5% to 100% Coreset Pruning)
+python scripts/run_scaling_benchmark.py</pre>
+    </section>
+
+    <!-- Citation -->
+    <section id="citation">
+      <h2 class="section-title">Citation</h2>
+      <p style="font-size: 0.92rem; color: var(--text-muted);">
+        If you use <code>RASPRO-FM</code> in your research, please cite our manuscript and foundational RASPRO work:
+      </p>
+      <pre class="code-block">@article{pathinarupothi2026rasprofm,
+  author  = {Pathinarupothi, Rahul Krishnan and Padmavilochanan, Durga and Ramesh, Maneesha Vinodini and Purkayastha, Saptarshi},
+  title   = {{RASPRO-FM}: Rapid Active Summarization for Data and Compute Efficient Biosignal Foundation Models},
+  journal = {Under Review at IEEE Journal of Biomedical and Health Informatics (JBHI)},
+  year    = {2026},
+  url     = {https://github.com/pprahul/raspro-fm}
+}
+
+@article{pathinarupothi2019iot,
+  author  = {Pathinarupothi, Rahul Krishnan and Durga, P. and Rangan, Ekanath Srihari},
+  title   = {{IoT}-Based Smart Edge for Global Health: Remote Monitoring With Severity Detection and Alerts Transmission},
+  journal = {IEEE Internet of Things Journal},
+  volume  = {6},
+  number  = {2},
+  pages   = {2449--2462},
+  year    = {2019},
+  doi     = {10.1109/JIOT.2018.2870068}
+}</pre>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      RASPRO-FM Research Project · Amrita Vishwa Vidyapeetham &amp; Indiana University · <a href="https://github.com/pprahul/raspro-fm" style="color: var(--primary); text-decoration: none;">GitHub Repository</a>
+    </div>
+  </footer>
+
+  <script>
+    const MOTIFS = [
+      {
+        token: "CM:NNNNNNNNN|REGx3",
+        type: "Type: Consensus Motif (CM)",
+        cmi: "CMI Urgency: 0.000",
+        len: "Active Sequence L = 2.1 tokens (Run-Length x3)",
+        slots: [
+          { name: "0: RR_RHYTHM", sym: "N", desc: "Normal sinus cycle (72 bpm)" },
+          { name: "1: QRS_DUR", sym: "N", desc: "Normal QRS width (88 ms)" },
+          { name: "2: ST_INF", sym: "N", desc: "Isoelectric II, III, aVF" },
+          { name: "3: ST_ANT", sym: "N", desc: "Isoelectric V1–V4" },
+          { name: "4: ST_LAT", sym: "N", desc: "Isoelectric I, aVL, V5–V6" },
+          { name: "5: V_AMP", sym: "N", desc: "Normal Sokolow-Lyon voltage" },
+          { name: "6: PR_COND", sym: "N", desc: "Normal PR interval (160 ms)" },
+          { name: "7: QRS_AXIS", sym: "N", desc: "Normal frontal axis (+45°)" },
+          { name: "8: QT_MORPH", sym: "N", desc: "No pathological Q / normal R-prog" }
+        ]
+      },
+      {
+        token: "CAM:NNZZANNNN|REG",
+        type: "Type: Consensus Abnormality Motif (CAM)",
+        cmi: "CMI Urgency: 0.485",
+        len: "Active Sequence L = 3.6 tokens (Never Merged)",
+        slots: [
+          { name: "0: RR_RHYTHM", sym: "N", desc: "Regular sinus rate" },
+          { name: "1: QRS_DUR", sym: "N", desc: "Narrow QRS complex" },
+          { name: "2: ST_INF", sym: "Z", desc: "Severe inferior ST elevation" },
+          { name: "3: ST_ANT", sym: "Z", desc: "Severe anterior V1–V4 STE" },
+          { name: "4: ST_LAT", sym: "A", desc: "Reciprocal lateral ST depression" },
+          { name: "5: V_AMP", sym: "N", desc: "Normal ventricular amplitude" },
+          { name: "6: PR_COND", sym: "N", desc: "Intact AV conduction" },
+          { name: "7: QRS_AXIS", sym: "N", desc: "Normal frontal axis" },
+          { name: "8: QT_MORPH", sym: "N", desc: "Hyperacute T-wave phase" }
+        ]
+      },
+      {
+        token: "CAM:NNNNNNNNZ|REG",
+        type: "Type: Consensus Abnormality Motif (CAM)",
+        cmi: "CMI Urgency: 0.264",
+        len: "Active Sequence L = 3.5 tokens (+19.4% MI Gain)",
+        slots: [
+          { name: "0: RR_RHYTHM", sym: "N", desc: "Normal sinus cycle" },
+          { name: "1: QRS_DUR", sym: "N", desc: "Normal QRS duration" },
+          { name: "2: ST_INF", sym: "N", desc: "ST returned to baseline" },
+          { name: "3: ST_ANT", sym: "N", desc: "ST returned to baseline" },
+          { name: "4: ST_LAT", sym: "N", desc: "Isoelectric lateral leads" },
+          { name: "5: V_AMP", sym: "N", desc: "Normal voltage" },
+          { name: "6: PR_COND", sym: "N", desc: "Normal PR conduction" },
+          { name: "7: QRS_AXIS", sym: "N", desc: "Normal axis" },
+          { name: "8: QT_MORPH", sym: "Z", desc: "Deep >40ms Q-wave + T inversion" }
+        ]
+      },
+      {
+        token: "CAM:ZNNNNNANN|IRR",
+        type: "Type: Consensus Abnormality Motif (CAM)",
+        cmi: "CMI Urgency: 0.590",
+        len: "Active Sequence L = 3.8 tokens (Irregular Rhythm)",
+        slots: [
+          { name: "0: RR_RHYTHM", sym: "Z", desc: "Rapid ventricular rate (>130 bpm)" },
+          { name: "1: QRS_DUR", sym: "N", desc: "Narrow supraventricular QRS" },
+          { name: "2: ST_INF", sym: "N", desc: "Isoelectric inferior ST" },
+          { name: "3: ST_ANT", sym: "N", desc: "Isoelectric anterior ST" },
+          { name: "4: ST_LAT", sym: "N", desc: "Rate-related mild strain" },
+          { name: "5: V_AMP", sym: "N", desc: "Normal R/S amplitude" },
+          { name: "6: PR_COND", sym: "A", desc: "Absent P-wave / fibrillatory baseline" },
+          { name: "7: QRS_AXIS", sym: "N", desc: "Normal frontal axis" },
+          { name: "8: QT_MORPH", sym: "N", desc: "No pathological Q-waves" }
+        ]
+      },
+      {
+        token: "CAM:NZNYZNNAN|REG",
+        type: "Type: Consensus Abnormality Motif (CAM)",
+        cmi: "CMI Urgency: 0.520",
+        len: "Active Sequence L = 3.5 tokens (Conduction Block)",
+        slots: [
+          { name: "0: RR_RHYTHM", sym: "N", desc: "Regular sinus rhythm" },
+          { name: "1: QRS_DUR", sym: "Z", desc: "Broad QRS > 140 ms (CLBBB)" },
+          { name: "2: ST_INF", sym: "N", desc: "Normal inferior ST" },
+          { name: "3: ST_ANT", sym: "Y", desc: "Discordant V1–V3 ST elevation" },
+          { name: "4: ST_LAT", sym: "Z", desc: "Lateral I, V5–V6 discordant ST-T" },
+          { name: "5: V_AMP", sym: "N", desc: "Deep V1 S-wave" },
+          { name: "6: PR_COND", sym: "N", desc: "Normal PR interval" },
+          { name: "7: QRS_AXIS", sym: "A", desc: "Leftward frontal axis shift" },
+          { name: "8: QT_MORPH", sym: "N", desc: "QS in V1–V2 secondary to LBBB" }
+        ]
+      }
+    ];
+
+    function selectMotif(idx) {
+      const buttons = document.querySelectorAll('#motif-tabs .pill-tab');
+      buttons.forEach((b, i) => b.classList.toggle('active', i === idx));
+      const m = MOTIFS[idx];
+      document.getElementById('motif-string').textContent = m.token;
+      document.getElementById('motif-type').textContent = m.type;
+      document.getElementById('motif-cmi').textContent = m.cmi;
+      document.getElementById('motif-len').textContent = m.len;
+
+      const container = document.getElementById('slots-container');
+      container.innerHTML = m.slots.map(s => `
+        <div class="slot-item">
+          <div class="slot-name">${s.name}</div>
+          <div class="slot-sym sym-${s.sym}">${s.sym}</div>
+          <div class="slot-Meaning">${s.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    selectMotif(0);
+  </script>
+</body>
+</html>
