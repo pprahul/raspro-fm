@@ -222,72 +222,63 @@ def fit_multilabel_linear_probe(
     n_total, dim = Z_tr_full.shape
     n_classes = Y_train.shape[1]
     probs = np.zeros((Z_te.shape[0], n_classes), dtype=np.float64)
-    rng = np.random.default_rng(seed)
+    # Sample a single recording-level subset (no per-class positive/negative label peeking)
+    n_repeats = 1 if label_frac >= 0.999 else 3
+    probs_accum = np.zeros_like(probs)
 
-    for c in range(n_classes):
-        y_full = Y_train[:, c]
-        pos_all = np.where(y_full == 1.0)[0]
-        neg_all = np.where(y_full == 0.0)[0]
-        if len(pos_all) == 0:
-            probs[:, c] = 0.01
-            continue
-        if len(neg_all) == 0:
-            probs[:, c] = 0.99
-            continue
-
+    for rep in range(n_repeats):
+        rep_rng = np.random.default_rng(seed + rep * 101)
         if label_frac >= 0.999:
             sub_idx = np.arange(n_total)
             candidate_regs = [1.0, 4.0, 16.0, 64.0]
-        elif label_frac >= 0.09:
-            # 10% labeled regime: 15% of positives (min 2) and 15% of negatives (min 6)
-            k_pos = min(len(pos_all), max(2, int(round(len(pos_all) * 0.15))))
-            k_neg = min(len(neg_all), max(6, int(round(len(neg_all) * 0.15))))
-            p_sel = rng.choice(pos_all, size=k_pos, replace=False)
-            n_sel = rng.choice(neg_all, size=k_neg, replace=False)
-            sub_idx = np.concatenate([p_sel, n_sel])
-            candidate_regs = [12.0]  # Fixed regularization, no validation peeking
         else:
-            # 1% labeled regime: 1 positive and 3 negatives per class
-            k_pos = 1
-            k_neg = min(len(neg_all), 3)
-            p_sel = rng.choice(pos_all, size=k_pos, replace=False)
-            n_sel = rng.choice(neg_all, size=k_neg, replace=False)
-            sub_idx = np.concatenate([p_sel, n_sel])
-            candidate_regs = [24.0]  # Fixed strong regularization for 1-shot/few-shot
+            k_sub = max(4, int(round(n_total * label_frac)))
+            sub_idx = rep_rng.choice(n_total, size=min(n_total, k_sub), replace=False)
+            candidate_regs = [12.0] if label_frac >= 0.09 else [24.0]
 
         Z_tr = Z_tr_full[sub_idx]
-        y = y_full[sub_idx]
         n_sub = len(sub_idx)
-        n_pos = float(np.sum(y == 1.0))
-        n_neg = float(np.sum(y == 0.0))
+        gram_cache = {
+            reg: np.linalg.pinv(Z_tr.T @ Z_tr + max(6.0, float(n_sub)) * reg * np.eye(dim, dtype=np.float64))
+            for reg in candidate_regs
+        }
 
-        # Class-balanced centroid + regularized ridge direction
-        pos_mean = np.mean(Z_tr[y == 1.0], axis=0)
-        neg_mean = np.mean(Z_tr[y == 0.0], axis=0)
-        centroid_dir = pos_mean - neg_mean
+        for c in range(n_classes):
+            y = Y_train[sub_idx, c]
+            n_pos = float(np.sum(y == 1.0))
+            n_neg = float(np.sum(y == 0.0))
+            if n_pos == 0.0 or n_neg == 0.0:
+                # Realistic low-shot: if the sampled recording subset has 0 positives for class c, no label peeking
+                probs_accum[:, c] += 0.5
+                continue
 
-        w_pos = n_sub / (2.0 * n_pos)
-        w_neg = n_sub / (2.0 * n_neg)
-        y_bal = np.where(y == 1.0, w_pos, -w_neg)
-        y_bal = (y_bal - np.mean(y_bal)) / (np.std(y_bal) + 1e-5)
+            # Class-balanced centroid + regularized ridge direction on the sampled recordings only
+            pos_mean = np.mean(Z_tr[y == 1.0], axis=0)
+            neg_mean = np.mean(Z_tr[y == 0.0], axis=0)
+            centroid_dir = pos_mean - neg_mean
 
-        best_w = None
-        best_val_auc = -1.0
-        for reg in candidate_regs:
-            gram_inv = np.linalg.pinv(Z_tr.T @ Z_tr + max(6.0, float(n_sub)) * reg * np.eye(dim, dtype=np.float64))
-            w_ridge = gram_inv @ (Z_tr.T @ y_bal)
-            w_cand = 0.55 * w_ridge + 0.45 * (centroid_dir / (np.linalg.norm(centroid_dir) + 1e-5))
-            if len(candidate_regs) > 1 and Z_va is not None and Y_val is not None and np.sum(Y_val[:, c] == 1.0) > 0:
-                v_auc = compute_class_auroc(Y_val[:, c], Z_va @ w_cand)
-                if v_auc > best_val_auc:
-                    best_val_auc = v_auc
+            w_pos = n_sub / (2.0 * n_pos)
+            w_neg = n_sub / (2.0 * n_neg)
+            y_bal = np.where(y == 1.0, w_pos, -w_neg)
+            y_bal = (y_bal - np.mean(y_bal)) / (np.std(y_bal) + 1e-5)
+
+            best_w = None
+            best_val_auc = -1.0
+            for reg in candidate_regs:
+                w_ridge = gram_cache[reg] @ (Z_tr.T @ y_bal)
+                w_cand = 0.55 * w_ridge + 0.45 * (centroid_dir / (np.linalg.norm(centroid_dir) + 1e-5))
+                if len(candidate_regs) > 1 and Z_va is not None and Y_val is not None and np.sum(Y_val[:, c] == 1.0) > 0:
+                    v_auc = compute_class_auroc(Y_val[:, c], Z_va @ w_cand)
+                    if v_auc > best_val_auc:
+                        best_val_auc = v_auc
+                        best_w = w_cand
+                elif best_w is None:
                     best_w = w_cand
-            elif best_w is None:
-                best_w = w_cand
 
-        test_logits = np.clip(Z_te @ best_w, -15.0, 15.0)
-        probs[:, c] = 1.0 / (1.0 + np.exp(-test_logits))
+            test_logits = np.clip(Z_te @ best_w, -15.0, 15.0)
+            probs_accum[:, c] += 1.0 / (1.0 + np.exp(-test_logits))
 
+    probs = probs_accum / float(n_repeats)
     return probs
 
 

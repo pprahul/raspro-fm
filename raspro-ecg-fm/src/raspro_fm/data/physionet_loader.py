@@ -203,7 +203,7 @@ def assign_multi_lead_ecg_label(
 
 def load_bidmc_cohort(
     cache_dir: Path,
-    n_patients: int = 12,
+    n_patients: int = 53,
     n_full_8min_patients: int = 5,
     window_sec: float = 10.0,
     fs: int = 125,

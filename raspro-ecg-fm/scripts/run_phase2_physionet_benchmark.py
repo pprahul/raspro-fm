@@ -353,7 +353,7 @@ def run_all_phase2_benchmarks(cache_dir: Path) -> Tuple[List[Dict[str, Any]], Di
     """Execute Track 1A (8-min ICU compression), Track 1B (Coupled ECG+PPG+RESP scaling), and Track 2 (Multi-Lead ECG & SSM vs. MSM)."""
     windows, full_8min_streams = load_bidmc_cohort(
         cache_dir=cache_dir / "bidmc",
-        n_patients=12,
+        n_patients=53,
         n_full_8min_patients=5,
         window_sec=10.0,
         fs=125,
@@ -397,35 +397,51 @@ def run_all_phase2_benchmarks(cache_dir: Path) -> Tuple[List[Dict[str, Any]], Di
         })
 
     # --- Track 1B: Coupled Multi-Sensor (`ECG + PPG + RESP`) Data-Scaling Benchmark ---
-    # Partition by contiguous patient-temporal blocks (30s-40s blocks) to prevent adjacent-window boundary leakage
+    # Partition by strict patient-disjoint cohorts (zero patient overlap across pretrain, train, and eval)
     def _partition_temporal_blocks(
         all_windows: List[BIDMCWindowRecord],
         label_fn,
         seed: int = 42,
     ) -> Tuple[List[BIDMCWindowRecord], List[BIDMCWindowRecord], List[BIDMCWindowRecord]]:
-        block_rng = random.Random(seed)
-        by_class_blocks: Dict[int, Dict[Tuple[str, int], List[BIDMCWindowRecord]]] = {0: {}, 1: {}, 2: {}, 3: {}}
+        pid_rng = random.Random(seed)
+        by_patient: Dict[str, List[BIDMCWindowRecord]] = {}
         for w in all_windows:
-            c = label_fn(w)
-            b_key = (w.patient_id, w.window_idx // 3)
-            by_class_blocks[c].setdefault(b_key, []).append(w)
+            by_patient.setdefault(w.patient_id, []).append(w)
 
-        ev_list: List[BIDMCWindowRecord] = []
-        tr_list: List[BIDMCWindowRecord] = []
-        pt_list: List[BIDMCWindowRecord] = []
+        # Group patients by their dominant clinical class for stratified patient-disjoint splitting
+        by_dom_class: Dict[int, List[str]] = {0: [], 1: [], 2: [], 3: []}
+        for pid, p_wins in sorted(by_patient.items()):
+            cls_counts = Counter(label_fn(w) for w in p_wins)
+            dom_c = cls_counts.most_common(1)[0][0]
+            by_dom_class.setdefault(dom_c, []).append(pid)
 
-        for c, block_map in by_class_blocks.items():
-            blocks = list(block_map.values())
-            block_rng.shuffle(blocks)
-            flat_items = [w for blk in blocks for w in blk]
-            n_c = len(flat_items)
-            n_ev = min(14, max(6, int(n_c * 0.25)))
-            n_tr = min(12, max(6, int(n_c * 0.22)))
-            ev_list.extend(flat_items[:n_ev])
-            tr_list.extend(flat_items[n_ev:n_ev + n_tr])
-            pt_list.extend(flat_items[n_ev + n_tr:])
+        ev_pids: List[str] = []
+        tr_pids: List[str] = []
+        pt_pids: List[str] = []
 
-        block_rng.shuffle(pt_list)
+        for c, pids in by_dom_class.items():
+            pids_shuf = list(pids)
+            pid_rng.shuffle(pids_shuf)
+            n_p = len(pids_shuf)
+            if n_p >= 3:
+                n_ev = max(1, int(round(n_p * 0.25)))
+                n_tr = max(1, int(round(n_p * 0.30)))
+                ev_pids.extend(pids_shuf[:n_ev])
+                tr_pids.extend(pids_shuf[n_ev:n_ev + n_tr])
+                pt_pids.extend(pids_shuf[n_ev + n_tr:])
+            elif n_p == 2:
+                ev_pids.append(pids_shuf[0])
+                tr_pids.append(pids_shuf[1])
+            elif n_p == 1:
+                tr_pids.append(pids_shuf[0])
+
+        ev_set, tr_set, pt_set = set(ev_pids), set(tr_pids), set(pt_pids)
+        assert len(ev_set & tr_set) == 0 and len(ev_set & pt_set) == 0 and len(tr_set & pt_set) == 0
+
+        ev_list = [w for w in all_windows if w.patient_id in ev_set]
+        tr_list = [w for w in all_windows if w.patient_id in tr_set]
+        pt_list = [w for w in all_windows if w.patient_id in pt_set]
+        pid_rng.shuffle(pt_list)
         return ev_list, tr_list, pt_list
 
     eval_cohort, train_cohort, pretrain_pool = _partition_temporal_blocks(

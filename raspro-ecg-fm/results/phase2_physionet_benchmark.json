@@ -1,0 +1,702 @@
+{
+  "bidmc_8min_compression": [
+    {
+      "patient_id": "bidmc01",
+      "duration_sec": 480.0,
+      "raw_samples": 120002,
+      "mean_hr": 91.3,
+      "mean_spo2": 96.9,
+      "patch_tokens": 2400,
+      "sax_tokens": 2400,
+      "bpe_tokens": 1555,
+      "raspro_beats": 730,
+      "raspro_active_tokens": 112,
+      "compression_vs_patch": 21.4,
+      "attention_flop_savings": 459.0,
+      "overall_cmi": 0.492,
+      "sample_motifs": [
+        "CAM:LNLHHE|REG",
+        "CAM:LNLEHE|REG",
+        "CAM:LNDENE|REGx2",
+        "CAM:LNDEDE|REG",
+        "CAM:LNDENE|REG"
+      ]
+    },
+    {
+      "patient_id": "bidmc02",
+      "duration_sec": 480.0,
+      "raw_samples": 120002,
+      "mean_hr": 91.1,
+      "mean_spo2": 100.0,
+      "patch_tokens": 2400,
+      "sax_tokens": 2400,
+      "bpe_tokens": 2049,
+      "raspro_beats": 728,
+      "raspro_active_tokens": 129,
+      "compression_vs_patch": 18.6,
+      "attention_flop_savings": 346.0,
+      "overall_cmi": 0.447,
+      "sample_motifs": [
+        "CAM:LHDEHN|REG",
+        "CAM:LEHEHN|REG",
+        "CAM:NEDEHN|REG",
+        "CAM:NEHELN|REG",
+        "CAM:NEEEHN|REG"
+      ]
+    },
+    {
+      "patient_id": "bidmc03",
+      "duration_sec": 480.0,
+      "raw_samples": 120002,
+      "mean_hr": 76.6,
+      "mean_spo2": 95.8,
+      "patch_tokens": 2400,
+      "sax_tokens": 2400,
+      "bpe_tokens": 1919,
+      "raspro_beats": 631,
+      "raspro_active_tokens": 51,
+      "compression_vs_patch": 47.1,
+      "attention_flop_savings": 2215.0,
+      "overall_cmi": 0.628,
+      "sample_motifs": [
+        "CAM:HDDEHN|REG",
+        "CAM:HDDDHN|REGx6",
+        "CAM:HDDDHN|REGx5",
+        "CAM:HDDEHN|IRR",
+        "CAM:HDDDHN|REGx2"
+      ]
+    },
+    {
+      "patient_id": "bidmc04",
+      "duration_sec": 480.0,
+      "raw_samples": 120002,
+      "mean_hr": 92.4,
+      "mean_spo2": 93.0,
+      "patch_tokens": 2400,
+      "sax_tokens": 2400,
+      "bpe_tokens": 1963,
+      "raspro_beats": 739,
+      "raspro_active_tokens": 104,
+      "compression_vs_patch": 23.1,
+      "attention_flop_savings": 533.0,
+      "overall_cmi": 0.624,
+      "sample_motifs": [
+        "CAM:DHDEDE|REG",
+        "CAM:LHDEHE|REG",
+        "CAM:LHDENE|REG",
+        "CAM:LHDDNE|REG",
+        "CAM:LHDDLE|REG"
+      ]
+    },
+    {
+      "patient_id": "bidmc05",
+      "duration_sec": 480.0,
+      "raw_samples": 120002,
+      "mean_hr": 98.2,
+      "mean_spo2": 99.3,
+      "patch_tokens": 2400,
+      "sax_tokens": 2400,
+      "bpe_tokens": 1864,
+      "raspro_beats": 785,
+      "raspro_active_tokens": 129,
+      "compression_vs_patch": 18.6,
+      "attention_flop_savings": 346.0,
+      "overall_cmi": 0.71,
+      "sample_motifs": [
+        "CAM:LLDEDE|REG",
+        "CAM:LLLEHE|REG",
+        "CAM:DLDEHE|REG",
+        "CAM:LLDEHE|REG",
+        "CAM:DLDEDE|REG"
+      ]
+    }
+  ],
+  "coupled_msm_scaling_benchmark": {
+    "n_windows_total": 939,
+    "n_pretrain": 494,
+    "n_train": 258,
+    "n_eval": 187,
+    "results": {
+      "Continuous Patch (Baseline)": {
+        "5%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.4777487433936588,
+          "ahe_auroc": 0.6491935483870968,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "10%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.45297699267009933,
+          "ahe_auroc": 0.6318548387096774,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "25%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.45198154108928684,
+          "ahe_auroc": 0.5887096774193549,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "50%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.45299723905963757,
+          "ahe_auroc": 0.5987903225806451,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "100%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.4722685190023398,
+          "ahe_auroc": 0.6633064516129032,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        }
+      },
+      "Vanilla SAX": {
+        "5%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.532743643166577,
+          "ahe_auroc": 0.41995967741935486,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 0.9813903743315509
+        },
+        "10%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5352153541090019,
+          "ahe_auroc": 0.4147177419354839,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 0.9986096256684492
+        },
+        "25%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5351013500409643,
+          "ahe_auroc": 0.4056451612903226,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 0.9994652406417113
+        },
+        "50%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5381567170898436,
+          "ahe_auroc": 0.4189516129032258,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "100%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5379097307342515,
+          "ahe_auroc": 0.41935483870967744,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        }
+      },
+      "SAX + BPE (ECG-Byte style)": {
+        "5%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5000323097214291,
+          "ahe_auroc": 0.41935483870967744,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 0.978029937228392
+        },
+        "10%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5097962305321764,
+          "ahe_auroc": 0.43911290322580643,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 0.998430709802028
+        },
+        "25%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5082010738968277,
+          "ahe_auroc": 0.4316532258064516,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 0.9993964268469339
+        },
+        "50%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5000931179455538,
+          "ahe_auroc": 0.4181451612903226,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 1.0
+        },
+        "100%": {
+          "accuracy": 0.44919786096256686,
+          "macro_f1": 0.15498154981549817,
+          "macro_auroc": 0.5009755341151851,
+          "ahe_auroc": 0.4247983870967742,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 1.0
+        }
+      },
+      "RASPRO ECG-Only (SSM)": {
+        "5%": {
+          "accuracy": 0.5828877005347594,
+          "macro_f1": 0.3327284275474095,
+          "macro_auroc": 0.7731336035954356,
+          "ahe_auroc": 0.7790322580645161,
+          "stemi_f1": 0.6019417475728156,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.9180555555555583
+        },
+        "10%": {
+          "accuracy": 0.5828877005347594,
+          "macro_f1": 0.3327284275474095,
+          "macro_auroc": 0.7798991027277851,
+          "ahe_auroc": 0.7703629032258065,
+          "stemi_f1": 0.6019417475728156,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.9423611111111142
+        },
+        "25%": {
+          "accuracy": 0.5828877005347594,
+          "macro_f1": 0.3327284275474095,
+          "macro_auroc": 0.7776922743385348,
+          "ahe_auroc": 0.8,
+          "stemi_f1": 0.6019417475728156,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.9663194444444462
+        },
+        "50%": {
+          "accuracy": 0.5828877005347594,
+          "macro_f1": 0.3327284275474095,
+          "macro_auroc": 0.7804166820927418,
+          "ahe_auroc": 0.8112903225806452,
+          "stemi_f1": 0.6019417475728156,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.980555555555557
+        },
+        "100%": {
+          "accuracy": 0.5828877005347594,
+          "macro_f1": 0.3327284275474095,
+          "macro_auroc": 0.7819771751668847,
+          "ahe_auroc": 0.8070564516129032,
+          "stemi_f1": 0.6019417475728156,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.9809027777777791
+        }
+      },
+      "RASPRO Multi-Sensor (MSM, Random)": {
+        "5%": {
+          "accuracy": 0.5508021390374331,
+          "macro_f1": 0.31794834869431643,
+          "macro_auroc": 0.747685126132481,
+          "ahe_auroc": 0.6995967741935484,
+          "stemi_f1": 0.6021505376344086,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.7887837837837862
+        },
+        "10%": {
+          "accuracy": 0.5721925133689839,
+          "macro_f1": 0.32741935483870965,
+          "macro_auroc": 0.7598480322662673,
+          "ahe_auroc": 0.7340725806451613,
+          "stemi_f1": 0.6,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.844619932432437
+        },
+        "25%": {
+          "accuracy": 0.5240641711229946,
+          "macro_f1": 0.2862701908957415,
+          "macro_auroc": 0.7679171887714784,
+          "ahe_auroc": 0.75,
+          "stemi_f1": 0.4666666666666666,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.8831925675675747
+        },
+        "50%": {
+          "accuracy": 0.5187165775401069,
+          "macro_f1": 0.28121919968460474,
+          "macro_auroc": 0.7704446918642353,
+          "ahe_auroc": 0.7558467741935484,
+          "stemi_f1": 0.449438202247191,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.9038851351351422
+        },
+        "100%": {
+          "accuracy": 0.5187165775401069,
+          "macro_f1": 0.28121919968460474,
+          "macro_auroc": 0.7674239415736376,
+          "ahe_auroc": 0.7578629032258064,
+          "stemi_f1": 0.449438202247191,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.9150253378378447
+        }
+      },
+      "RASPRO Multi-Sensor (MSM + CMI Coreset)": {
+        "5%": {
+          "accuracy": 0.49732620320855614,
+          "macro_f1": 0.25549242424242424,
+          "macro_auroc": 0.7430434105442513,
+          "ahe_auroc": 0.7223790322580645,
+          "stemi_f1": 0.3636363636363636,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.8255658783783795
+        },
+        "10%": {
+          "accuracy": 0.5401069518716578,
+          "macro_f1": 0.29893999805504234,
+          "macro_auroc": 0.7600191019054766,
+          "ahe_auroc": 0.7372983870967742,
+          "stemi_f1": 0.5054945054945055,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.8661064189189239
+        },
+        "25%": {
+          "accuracy": 0.5401069518716578,
+          "macro_f1": 0.3009072580645161,
+          "macro_auroc": 0.7631309085535454,
+          "ahe_auroc": 0.745766129032258,
+          "stemi_f1": 0.5161290322580645,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.8957685810810874
+        },
+        "50%": {
+          "accuracy": 0.5401069518716578,
+          "macro_f1": 0.3009072580645161,
+          "macro_auroc": 0.7687479022632812,
+          "ahe_auroc": 0.757258064516129,
+          "stemi_f1": 0.5161290322580645,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.9117314189189261
+        },
+        "100%": {
+          "accuracy": 0.5187165775401069,
+          "macro_f1": 0.28121919968460474,
+          "macro_auroc": 0.7672494728908793,
+          "ahe_auroc": 0.7586693548387097,
+          "stemi_f1": 0.449438202247191,
+          "avg_seq_len": 3.165775401069519,
+          "relative_attention_flops": 0.00400885355600675,
+          "vocab_coverage": 0.9150253378378447
+        }
+      }
+    }
+  },
+  "ecg_3lead_scaling_benchmark": {
+    "n_windows_total": 939,
+    "n_pretrain": 419,
+    "n_train": 291,
+    "n_eval": 229,
+    "results": {
+      "Continuous Patch (Leads II+V)": {
+        "5%": {
+          "accuracy": 0.4978165938864629,
+          "macro_f1": 0.17431192660550457,
+          "macro_auroc": 0.5842256307606339,
+          "ahe_auroc": 0.5078055964653903,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "10%": {
+          "accuracy": 0.4978165938864629,
+          "macro_f1": 0.17431192660550457,
+          "macro_auroc": 0.5855636204365473,
+          "ahe_auroc": 0.5103092783505154,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "25%": {
+          "accuracy": 0.4978165938864629,
+          "macro_f1": 0.17431192660550457,
+          "macro_auroc": 0.578564826368179,
+          "ahe_auroc": 0.5344624447717231,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "50%": {
+          "accuracy": 0.4978165938864629,
+          "macro_f1": 0.17431192660550457,
+          "macro_auroc": 0.5868928549918805,
+          "ahe_auroc": 0.5187039764359352,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        },
+        "100%": {
+          "accuracy": 0.4978165938864629,
+          "macro_f1": 0.17431192660550457,
+          "macro_auroc": 0.5796636379005375,
+          "ahe_auroc": 0.5452135493372606,
+          "stemi_f1": 0.0,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        }
+      },
+      "Vanilla SAX (Leads II+V)": {
+        "5%": {
+          "accuracy": 0.5240174672489083,
+          "macro_f1": 0.23861123396727113,
+          "macro_auroc": 0.6361386477042497,
+          "ahe_auroc": 0.598379970544919,
+          "stemi_f1": 0.2857142857142857,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 0.9724017467248909
+        },
+        "10%": {
+          "accuracy": 0.5240174672489083,
+          "macro_f1": 0.23507914867833068,
+          "macro_auroc": 0.6304632442619525,
+          "ahe_auroc": 0.6027982326951399,
+          "stemi_f1": 0.2716049382716049,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 0.9768558951965065
+        },
+        "25%": {
+          "accuracy": 0.519650655021834,
+          "macro_f1": 0.22916666666666666,
+          "macro_auroc": 0.6231209751104496,
+          "ahe_auroc": 0.6079528718703976,
+          "stemi_f1": 0.25,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 0.994410480349345
+        },
+        "50%": {
+          "accuracy": 0.519650655021834,
+          "macro_f1": 0.22916666666666666,
+          "macro_auroc": 0.6271770426025481,
+          "ahe_auroc": 0.6098674521354934,
+          "stemi_f1": 0.25,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 0.9983406113537118
+        },
+        "100%": {
+          "accuracy": 0.5152838427947598,
+          "macro_f1": 0.22312056190182156,
+          "macro_auroc": 0.6276244334239549,
+          "ahe_auroc": 0.6113402061855671,
+          "stemi_f1": 0.22784810126582278,
+          "avg_seq_len": 50.0,
+          "relative_attention_flops": 1.0,
+          "vocab_coverage": 1.0
+        }
+      },
+      "SAX + BPE (ECG-Byte style)": {
+        "5%": {
+          "accuracy": 0.5109170305676856,
+          "macro_f1": 0.2698061525495154,
+          "macro_auroc": 0.6305323385921324,
+          "ahe_auroc": 0.4955817378497791,
+          "stemi_f1": 0.46017699115044247,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 0.9574905021049389
+        },
+        "10%": {
+          "accuracy": 0.5327510917030568,
+          "macro_f1": 0.28090548742722654,
+          "macro_auroc": 0.6114335859759374,
+          "ahe_auroc": 0.49042709867452133,
+          "stemi_f1": 0.4814814814814815,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 0.9727898141492967
+        },
+        "25%": {
+          "accuracy": 0.5283842794759825,
+          "macro_f1": 0.27488174077578054,
+          "macro_auroc": 0.6009753838878685,
+          "ahe_auroc": 0.5023564064801178,
+          "stemi_f1": 0.45714285714285713,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 0.9934284834171886
+        },
+        "50%": {
+          "accuracy": 0.537117903930131,
+          "macro_f1": 0.28492703651253,
+          "macro_auroc": 0.6100893989753213,
+          "ahe_auroc": 0.5116347569955817,
+          "stemi_f1": 0.49541284403669716,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 0.9980490810144779
+        },
+        "100%": {
+          "accuracy": 0.5414847161572053,
+          "macro_f1": 0.2872073578595318,
+          "macro_auroc": 0.6088343566542276,
+          "ahe_auroc": 0.5160530191458027,
+          "stemi_f1": 0.5,
+          "avg_seq_len": 44.29946524064171,
+          "relative_attention_flops": 0.7849770482427293,
+          "vocab_coverage": 1.0
+        }
+      },
+      "RASPRO 3-Lead SSM (Random)": {
+        "5%": {
+          "accuracy": 0.7030567685589519,
+          "macro_f1": 0.4020492866407263,
+          "macro_auroc": 0.7222936933127287,
+          "ahe_auroc": 0.8658321060382916,
+          "stemi_f1": 0.8533333333333333,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.7617971530249097
+        },
+        "10%": {
+          "accuracy": 0.6724890829694323,
+          "macro_f1": 0.38263694267515924,
+          "macro_auroc": 0.7019053470395824,
+          "ahe_auroc": 0.8687776141384389,
+          "stemi_f1": 0.8025477707006369,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8111654804270518
+        },
+        "25%": {
+          "accuracy": 0.6768558951965066,
+          "macro_f1": 0.3857654889912954,
+          "macro_auroc": 0.6970693319451109,
+          "ahe_auroc": 0.8709867452135494,
+          "stemi_f1": 0.8129032258064516,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8409252669039211
+        },
+        "50%": {
+          "accuracy": 0.6768558951965066,
+          "macro_f1": 0.3857654889912954,
+          "macro_auroc": 0.6911469970252642,
+          "ahe_auroc": 0.8698085419734904,
+          "stemi_f1": 0.8129032258064516,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8426779359430672
+        },
+        "100%": {
+          "accuracy": 0.6768558951965066,
+          "macro_f1": 0.3857654889912954,
+          "macro_auroc": 0.6924029642038282,
+          "ahe_auroc": 0.8699558173784978,
+          "stemi_f1": 0.8129032258064516,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8505071174377294
+        }
+      },
+      "RASPRO 3-Lead SSM + CMI Coreset": {
+        "5%": {
+          "accuracy": 0.6899563318777293,
+          "macro_f1": 0.39204928664072636,
+          "macro_auroc": 0.6845511088426156,
+          "ahe_auroc": 0.8561119293078056,
+          "stemi_f1": 0.8133333333333335,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.7715658362989339
+        },
+        "10%": {
+          "accuracy": 0.6899563318777293,
+          "macro_f1": 0.39289022695692455,
+          "macro_auroc": 0.7141806367816046,
+          "ahe_auroc": 0.8581737849779086,
+          "stemi_f1": 0.8235294117647058,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8068327402135292
+        },
+        "25%": {
+          "accuracy": 0.6768558951965066,
+          "macro_f1": 0.3857654889912954,
+          "macro_auroc": 0.6956046228355307,
+          "ahe_auroc": 0.8662739322533137,
+          "stemi_f1": 0.8129032258064516,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8334875444839913
+        },
+        "50%": {
+          "accuracy": 0.6768558951965066,
+          "macro_f1": 0.3857654889912954,
+          "macro_auroc": 0.6931306127398413,
+          "ahe_auroc": 0.8655375552282769,
+          "stemi_f1": 0.8129032258064516,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8505071174377294
+        },
+        "100%": {
+          "accuracy": 0.6768558951965066,
+          "macro_f1": 0.3857654889912954,
+          "macro_auroc": 0.692473986931101,
+          "ahe_auroc": 0.8699558173784978,
+          "stemi_f1": 0.8129032258064516,
+          "avg_seq_len": 2.3101604278074865,
+          "relative_attention_flops": 0.002134736480883068,
+          "vocab_coverage": 0.8505071174377294
+        }
+      }
+    }
+  }
+}

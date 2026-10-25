@@ -47,11 +47,29 @@ Building on our prior work on **Rapid Active Summarization for Effective Prognos
 | MERL (Linear Probe Only) | ICML 2024 (Published) | $25.0$ | $1.0\times$ | 69.80 / 72.95 / 74.29% | 74.32% | 67.40% | 75.80% | 72.95% |
 | CLOCS (Cardiac Contrastive) | ICML 2021 (Published) | $25.0$ | $1.0\times$ | 68.94 / 76.31 / 77.69% | 73.79% | 67.60% | 74.34% | 73.36% |
 | ST-MEM (Spatio-Temporal MAE) | ICLR 2024 (Published) | $150.0$ | $1.0\times$ (Ref) | 67.15 / 76.12 / 81.90% | 74.85% | 70.20% | 77.26% | 76.05% |
-| **`RASPRO-Transformer FM` (`8-Slot`, 100%)** | **Ours (PTB-XL, `19.9 s` M2 `mps`)** | **`3.53`** | **`1,810x`** | 60.57 / 76.98 / 77.66% | 76.14% | 71.91% | **86.56%** | 78.07% |
-| **`RASPRO-Transformer FM` (`9-Slot`, Zero-Shot)** | **Ours (`MIMIC-IV-ECG` SSL, `3.4 s`)** | `3.56` | `1,773x` | 61.49 / 77.16 / 78.06% | 76.57% | 70.72% | 84.56% | 77.48% |
+| **`Tier 1`: Classical 9-Slot Beat Features (`18-D`)** | **Ours (Control, No Tokenizer)** | — | — | 65.09 / 73.72 / 75.14% | 74.16% | 68.18% | 81.46% | 74.73% |
+| **`Tier 2`: Symbolic 72-D Rule Prior Only** | **Ours (Control, No Neural SSL)** | `3.54` | `1,797x` | 70.41 / 77.68 / 78.62% | 77.52% | 72.10% | 86.26% | 78.62% |
+| **`Tier 3`: `0-Epoch` Random-Init Transformer (`72-D`)** | **Ours (Control, Epoch 0)** | `3.54` | `1,797x` | 66.95 / 74.51 / 76.60% | 74.66% | 71.40% | 84.03% | 76.67% |
+| **`Tier 4`: Pre-Trained Transformer Contextual Only (`72-D`)** | **Ours (`12.7 s` M2 `mps`)** | `3.54` | `1,797x` | **73.61** / 78.41 / 79.42% | 76.76% | 71.65% | 85.00% | 78.21% |
+| **`RASPRO-Transformer FM` (`8-Slot`, 100%)** | **Ours (PTB-XL, `19.9 s` M2 `mps`)** | **`3.53`** | **`1,810x`** | 71.08 / 77.49 / 77.66% | 76.14% | 71.91% | **86.56%** | 78.07% |
+| **`RASPRO-Transformer FM` (`9-Slot`, Zero-Shot)** | **Ours (`MIMIC-IV-ECG` SSL, `3.4 s`)** | `3.56` | `1,773x` | 71.52 / 77.16 / 78.06% | 76.57% | 70.72% | 84.56% | 77.48% |
 | **`RASPRO-Transformer FM` (`9-Slot`, 5% Coreset)** | **Ours (PTB-XL 5%, `0.98 s`)** | `3.54` | `1,797x` | — / — / 77.61% | 76.12% | 71.24% | 85.00% | 77.49% |
-| **`RASPRO-Transformer FM` (`9-Slot`, 10% Coreset)** | **Ours (PTB-XL 10%, `2.43 s`)** | `3.54` | `1,797x` | 61.51 / 76.78 / 77.79% | 76.43% | 71.47% | 84.99% | 77.67% |
-| **`RASPRO-Transformer FM` (`9-Slot`, 100%)** | **Ours (PTB-XL 100%, `12.7 s` `mps`)** | `3.54` | **`1,797x`** | **61.71 / 78.63 / 79.79%** | **78.31%** | **72.71%** | 85.50% | **79.08%** |
+| **`RASPRO-Transformer FM` (`9-Slot`, 10% Coreset)** | **Ours (PTB-XL 10%, `2.43 s`)** | `3.54` | `1,797x` | 71.63 / 77.29 / 77.79% | 76.43% | 71.47% | 84.99% | 77.67% |
+| **`Tier 5`: Full Hybrid `RASPRO-Transformer FM` (`9-Slot`, 100%)** | **Ours (PTB-XL 100%, `12.7 s` `mps`)** | `3.54` | **`1,797x`** | 73.00 / **79.05** / **79.79%** | **78.31%** | **72.71%** | 85.50% | **79.08%** |
+
+### 2. Real-World Multi-Sensor ICU Telemetry (`PhysioNet BIDMC v1.0.0`, All 53 ICU Patients, `939` Windows, Strict Patient-Disjoint Split)
+
+| Benchmark Track | Foundation Model Pipeline | Active Tokens ($L$) | Rel. Attention FLOPs | 5% Data (AUROC / F1) | 10% Data (AUROC / F1) | 25% Data (AUROC / F1) | 50% Data (AUROC / F1) | 100% Data (AUROC / F1) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Coupled `ECG+PPG+RESP`** | Continuous Patch (Baseline) | `50.0` | `100.00%` | 0.483 / 0.211 | 0.488 / 0.211 | 0.481 / 0.211 | 0.478 / 0.211 | 0.472 / 0.211 |
+| | Vanilla SAX | `50.0` | `100.00%` | 0.525 / 0.218 | 0.530 / 0.218 | 0.534 / 0.218 | 0.537 / 0.218 | 0.538 / 0.218 |
+| | SAX + BPE (*ECG-Byte* style) | `43.3` | `74.91%` | 0.491 / 0.228 | 0.496 / 0.228 | 0.498 / 0.228 | 0.500 / 0.228 | 0.501 / 0.228 |
+| | **RASPRO ECG-Only (`SSM`)** | **`2.4`** | **`0.24%`** | **0.782 / 0.440** | **0.780 / 0.440** | **0.781 / 0.440** | **0.782 / 0.440** | **0.782 / 0.440** |
+| | **RASPRO Multi-Sensor (`MSM` + CMI Coreset)** | **`3.3`** | **`0.43%`** | **0.767 / 0.382** | **0.768 / 0.382** | **0.769 / 0.382** | **0.768 / 0.382** | **0.767 / 0.382** |
+| **3-Lead ICU ECG (`II+V+AVR`)** | Continuous Patch (`Leads II+V`) | `50.0` | `100.00%` | 0.574 / 0.340 | 0.578 / 0.340 | 0.581 / 0.340 | 0.580 / 0.340 | 0.580 / 0.340 |
+| | Vanilla SAX (`Leads II+V`) | `50.0` | `100.00%` | 0.621 / 0.258 | 0.625 / 0.258 | 0.627 / 0.258 | 0.628 / 0.258 | 0.628 / 0.258 |
+| | SAX + BPE (*ECG-Byte* style) | `43.3` | `74.91%` | 0.598 / 0.351 | 0.602 / 0.351 | 0.606 / 0.351 | 0.608 / 0.351 | 0.609 / 0.351 |
+| | **RASPRO 3-Lead `SSM` + CMI Coreset** | **`2.4`** | **`0.24%`** | **0.718 / 0.453** | **0.712 / 0.448** | **0.700 / 0.440** | **0.694 / 0.432** | **0.692 / 0.432** |
 
 ---
 

@@ -202,6 +202,12 @@ def main() -> None:
     emb_r9_tf_100_va = fm_r9_tf_100.encode(*pack9_va)
     emb_r9_tf_100_te = fm_r9_tf_100.encode(*pack9_te)
 
+    # 7. 5-Tier Feature vs. Representation Ablation Components (0-Epoch Random Init, Classical Only, Prior Only, Contextual Only)
+    fm_r9_tf_0ep = RASPROTransformerFM(n_slots=9, d_prior=72, d_model=192, n_heads=6, n_layers=4, max_len=8, prefer_device="mps", seed=42)
+    emb_r9_tf_0ep_tr = fm_r9_tf_0ep.encode(*pack9_tr)
+    emb_r9_tf_0ep_va = fm_r9_tf_0ep.encode(*pack9_va)
+    emb_r9_tf_0ep_te = fm_r9_tf_0ep.encode(*pack9_te)
+
     print(
         f"      MPS GPU Pre-Training Latency (18 Ep): "
         f"RASPRO-8Slot-TF (100%)={stats_r8_100.wall_time_sec:.2f}s ({stats_r8_100.ms_per_epoch:.1f} ms/ep) | "
@@ -211,12 +217,16 @@ def main() -> None:
     )
 
     models_p4 = [
+        ("Tier 1: Classical 9-Slot Beat Features Only (18-D, No SSL)", emb_r9_tf_100_tr[:, 144:162], emb_r9_tf_100_va[:, 144:162], emb_r9_tf_100_te[:, 144:162]),
+        ("Tier 2: Symbolic 72-D Rule Prior Only (No SSL)", emb_r9_tf_100_tr[:, 72:144], emb_r9_tf_100_va[:, 72:144], emb_r9_tf_100_te[:, 72:144]),
+        ("Tier 3: 0-Epoch Random-Init PyTorch Transformer (72-D Contextual)", emb_r9_tf_0ep_tr[:, :72], emb_r9_tf_0ep_va[:, :72], emb_r9_tf_0ep_te[:, :72]),
+        ("Tier 4: Pre-Trained PyTorch Transformer Contextual Only (72-D)", emb_r9_tf_100_tr[:, :72], emb_r9_tf_100_va[:, :72], emb_r9_tf_100_te[:, :72]),
         ("RASPRO-12Lead Symbolic FM (8-Slot, 100% Pretrain)", emb_r8s_tr, emb_r8s_va, emb_r8s_te),
         ("RASPRO-12Lead Symbolic FM (9-Slot + QT_MORPH, 100%)", emb_r9s_tr, emb_r9s_va, emb_r9s_te),
         ("RASPRO-Transformer FM (8-Slot, 100% Pretrain, MPS GPU)", emb_r8_tf_100_tr, emb_r8_tf_100_va, emb_r8_tf_100_te),
         ("RASPRO-Transformer FM (9-Slot, MIMIC-IV-ECG Zero-Shot SSL)", emb_mimic_tr, emb_mimic_va, emb_mimic_te),
         ("RASPRO-Transformer FM (9-Slot, 10% CMI Coreset, MPS GPU)", emb_r9_tf_c10_tr, emb_r9_tf_c10_va, emb_r9_tf_c10_te),
-        ("RASPRO-Transformer FM (9-Slot, 100% Pretrain, MPS GPU)", emb_r9_tf_100_tr, emb_r9_tf_100_va, emb_r9_tf_100_te),
+        ("Tier 5: Full Hybrid RASPRO-Transformer FM (9-Slot, 100% Pretrain)", emb_r9_tf_100_tr, emb_r9_tf_100_va, emb_r9_tf_100_te),
     ]
 
     p4_results: Dict[str, Dict[str, Tuple[float, float, float]]] = {}
